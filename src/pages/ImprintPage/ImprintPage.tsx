@@ -1,5 +1,6 @@
 // src/pages/ImprintPage/ImprintPage.tsx
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from '@/components/Navbar/Navbar';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
 import { Card } from '@/components/Card/Card';
@@ -8,13 +9,13 @@ import { Button } from '@/components/Button/Button';
 import { Select } from '@/components/Select/Select';
 import { Modal } from '@/components/Modal/Modal';
 
-// ИМПОРТ КОМПОНЕНТОВ БИЗНЕС-ЛОГИКИ С УКАЗАНИЕМ ИХ ТИПОВ
+// ИМПОРТ КОМПОНЕНТОВ БИЗНЕС-ЛОГИКИ С СИСТЕМНЫМ УКАЗАНИЕМ ИХ ТИПОВ ДЛЯ VERBATIMMODULESYNTAX
 import { ContactList, type ContactListProps } from '../../features/ContactList/ContactList';
 import { Requisites, type RequisitesProps } from '../../features/Requisites/Requisites';
 import { WeatherWidget } from '../../components/WeatherWidget/WeatherWidget';
 import { Toast } from '@/components/Toast/Toast';
 
-// ИМПОРТ КАРТИНКИ АВТОПАРКА
+// ИМПОРТ КАРТИНКИ АВТОПАРКА СЕЦТЕХНИКИ
 import trucksImg from '@/assets/trucks.png';
 
 interface NewsItem {
@@ -33,7 +34,7 @@ export const ImprintPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Массив новостей, редактируемый напрямую через код
+  // Статический массив ваших публикаций
   const staticNews: NewsItem[] = [
     {
       id: 3,
@@ -73,13 +74,13 @@ export const ImprintPage: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-main)', scrollBehavior: 'smooth' }}>
-      {/* 1. Фиксированная верхняя шапка */}
+      {/* 1. Верхняя фиксированная навигационная шапка */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* 2. Гибкий контейнер-обертка Flexbox для выравнивания */}
       <div style={{ display: 'flex', marginTop: '70px' }}>
         
-        {/* Боковая панель */}
+        {/* Боковая липкая панель */}
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* 3. Основной контент, автоматически занимающий все свободное место */}
@@ -113,7 +114,7 @@ export const ImprintPage: React.FC = () => {
             </Button>
           </header>
 
-          {/* СТИЛЬНЫЙ БАННЕР С ПРАВИЛЬНЫМ ИСПОЛЬЗОВАНИЕМ ПЕРЕМЕННОЙ trucksImg */}
+          {/* Широкоформатный баннер спецтехники автопарка */}
           <div style={{
             width: '100%',
             background: 'var(--bg-card)',
@@ -144,7 +145,7 @@ export const ImprintPage: React.FC = () => {
           {/* Двухколоночная адаптивная сетка контента */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '32px', alignItems: 'start', position: 'relative', zIndex: 1 }}>
             
-            {/* ЛЕВАЯ КОЛОНКА */}
+            {/* ЛЕВАЯ КОЛОНКА (Интерактив, Лента с анимациями) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               
               {/* Калькулятор */}
@@ -174,7 +175,7 @@ export const ImprintPage: React.FC = () => {
                 </div>
               </Card>
 
-              {/* Лента публикаций */}
+              {/* Лента публикаций с Framer Motion анимацией */}
               <div id="news" style={{ display: 'flex', flexDirection: 'column', gap: '20px', scrollMarginTop: '100px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0 }}>Актуальные публикации</h2>
@@ -201,17 +202,31 @@ export const ImprintPage: React.FC = () => {
                   </div>
                 </div>
 
-                {filteredNews.map((item) => (
-                  <Card key={item.id}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>{item.title}</h3>
-                      <span style={{ fontSize: '12px', color: 'var(--accent-primary)', fontFamily: 'monospace', background: 'var(--accent-glow)', padding: '2px 8px', borderRadius: '4px' }}>
-                        {item.date}
-                      </span>
-                    </div>
-                    <p style={{ margin: 0, color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '15px' }}>{item.content}</p>
-                  </Card>
-                ))}
+                {/* Контейнер плавного скрытия и перестроения карточек (layout) */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <AnimatePresence mode="popLayout">
+                    {filteredNews.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                      >
+                        <Card animateOnScroll>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>{item.title}</h3>
+                            <span style={{ fontSize: '12px', color: 'var(--accent-primary)', fontFamily: 'monospace', background: 'var(--accent-glow)', padding: '2px 8px', borderRadius: '4px' }}>
+                              {item.date}
+                            </span>
+                          </div>
+                          <p style={{ margin: 0, color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '15px' }}>{item.content}</p>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </div>
 
               {/* Встроенная интерактивная карта */}
@@ -230,10 +245,10 @@ export const ImprintPage: React.FC = () => {
 
             </div>
 
-            {/* ПРАВАЯ КОЛОНКА */}
+            {/* ПРАВАЯ КОЛОНКА (Служебные виджеты) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               
-              {/* Виджет погоды Витебска */}
+              {/* Виджет живой погоды Витебска */}
               <WeatherWidget />
               
               {/* Бланки документов */}
@@ -292,7 +307,7 @@ export const ImprintPage: React.FC = () => {
         </form>
       </Modal>
 
-      {/* Глобальный компонент всплывающих уведомлений */}
+      {/* Компонент всплывающих уведомлений (Toasts) */}
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
 
     </div>
