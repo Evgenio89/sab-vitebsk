@@ -4,15 +4,15 @@
   left: 0;
   right: 0;
   height: 70px;
-  background: rgba(13, 17, 24, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
   z-index: 100;
+  box-shadow: var(--shadow);
+  transition: background 0.3s, border 0.3s;
 }
 
 .logo {
@@ -23,22 +23,45 @@
 
 .logoDot {
   color: var(--accent-primary);
-  text-shadow: 0 0 10px var(--accent-primary);
+}
+
+.rightMenu {
+  display: flex;
+  align-items: center;
+  gap: 32px;
 }
 
 .menu {
   display: flex;
-  gap: 32px;
+  gap: 24px;
 }
 
 .link {
   color: var(--text-muted);
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.2s ease;
 }
 
 .link:hover, .activeLink {
   color: var(--accent-primary);
+}
+
+.themeToggle {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.themeToggle:hover {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
 }

@@ -1,43 +1,34 @@
 .card {
   background: var(--bg-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 32px;
-  transition: all 0.4s ease;
-}
-
-.card:hover {
-  border-color: rgba(135, 249, 8, 0.3);
-  box-shadow: 0 10px 40px rgba(135, 249, 8, 0.03);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
 }
 
 .title {
-  margin: 0 0 24px 0;
-  font-size: 19px;
+  margin: 0 0 20px 0;
+  font-size: 18px;
   font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.3px;
+  color: var(--text-main);
   position: relative;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 }
 
-/* Неоновый индикатор под заголовком */
 .title::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 30px;
-  height: 2px;
+  width: 35px;
+  height: 2.5px;
   background: var(--accent-primary);
   border-radius: 2px;
-  box-shadow: 0 0 8px var(--accent-primary);
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }

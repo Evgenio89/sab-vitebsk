@@ -6,13 +6,16 @@ interface InfoRowProps {
   label: string;
   value: string;
   isCopyable?: boolean;
+  onCopySuccess?: (msg: string) => void; // Новый колбэк
 }
 
-export const InfoRow: React.FC<InfoRowProps> = ({ label, value, isCopyable = false }) => {
+export const InfoRow: React.FC<InfoRowProps> = ({ label, value, isCopyable = false, onCopySuccess }) => {
   const handleCopy = () => {
     if (isCopyable) {
       navigator.clipboard.writeText(value);
-      alert(`Скопировано: ${value}`);
+      if (onCopySuccess) {
+        onCopySuccess(`Успешно скопировано: ${label}`);
+      }
     }
   };
 
@@ -22,7 +25,6 @@ export const InfoRow: React.FC<InfoRowProps> = ({ label, value, isCopyable = fal
       <span 
         className={`${styles.value} ${isCopyable ? styles.copyable : ''}`} 
         onClick={handleCopy}
-        title={isCopyable ? "Нажмите для копирования" : undefined}
       >
         {value}
       </span>

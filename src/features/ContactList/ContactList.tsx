@@ -1,8 +1,13 @@
+// src/features/ContactList/ContactList.tsx
 import React from 'react';
 import { Card } from '../../components/Card/Card';
 import { InfoRow } from '../../components/InfoRow/InfoRow';
 
-export const ContactList: React.FC = () => {
+export interface ContactListProps {
+  onCopySuccess?: (msg: string) => void;
+}
+
+export const ContactList: React.FC<ContactListProps> = ({ onCopySuccess }) => {
   const contacts = [
     { label: 'Приемная тел./факс', value: '+375 (212) 22-76-44' },
     { label: 'Диспетчерская', value: '+375 (212) 22-76-21' },
@@ -15,7 +20,12 @@ export const ContactList: React.FC = () => {
   return (
     <Card title="Телефоны и контакты служб">
       {contacts.map((item, idx) => (
-        <InfoRow key={idx} label={item.label} value={item.value} />
+        <InfoRow 
+          key={idx} 
+          label={item.label} 
+          value={item.value} 
+          onCopySuccess={onCopySuccess}
+        />
       ))}
     </Card>
   );

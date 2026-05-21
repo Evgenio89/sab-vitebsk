@@ -1,22 +1,23 @@
 .sidebar {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  bottom: 0;
-  width: 260px;
-  background: rgba(13, 17, 24, 0.5);
+  /* УБИРАЕМ position: fixed, top, left, bottom */
+  width: 240px;
+  min-width: 240px; /* Чтобы панель не сжималась на узких экранах */
+  background: var(--bg-card);
   border-right: 1px solid var(--border-color);
-  padding: 40px 24px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  z-index: 90;
+  gap: 28px;
+  height: calc(100vh - 70px); /* Высота ровно от нижней границы шапки */
+  position: sticky; /* Панель будет красиво оставаться на месте при скролле */
+  top: 70px;
+  transition: background 0.3s, border 0.3s;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .sectionTitle {
@@ -24,7 +25,7 @@
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   margin-bottom: 4px;
 }
 
@@ -33,7 +34,7 @@
   align-items: center;
   padding: 10px 14px;
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--text-main);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -41,12 +42,12 @@
 }
 
 .sideLink:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--accent-glow);
   color: var(--accent-primary);
 }
 
 .sideLinkActive {
   background: var(--accent-glow);
   color: var(--accent-primary);
-  border-left: 3px solid var(--accent-primary);
+  font-weight: 600;
 }

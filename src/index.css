@@ -1,11 +1,24 @@
 :root {
-  --bg-main: #06080c;           /* Еще более глубокий космический черный фон */
-  --bg-card: rgba(13, 17, 24, 0.75); /* Полупрозрачное темное стекло */
-  --border-color: rgba(135, 249, 8, 0.08); /* Границы с легким зеленым оттенком */
-  --accent-primary: #87f908;    /* Ваш кастомный неоновый зеленый */
-  --accent-glow: rgba(135, 249, 8, 0.12); /* Мягкое зеленое свечение */
+  --bg-main: #f4f6f9;
+  --bg-card: #ffffff;
+  --border-color: #e2e8f0;
+  --accent-primary: #5ec200; 
+  --accent-glow: rgba(94, 194, 0, 0.08);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Темная тема (Включается динамически) */
+:root.dark {
+  --bg-main: #06080c;
+  --bg-card: #0d1118;
+  --border-color: rgba(135, 249, 8, 0.08);
+  --accent-primary: #87f908; 
+  --accent-glow: rgba(135, 249, 8, 0.12);
   --text-main: #f9fafb;
   --text-muted: #9ca3af;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 body {
@@ -14,4 +27,5 @@ body {
   color: var(--text-main);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
