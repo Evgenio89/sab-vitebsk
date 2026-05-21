@@ -9,10 +9,13 @@ import { Select } from '@/components/Select/Select';
 import { Modal } from '@/components/Modal/Modal';
 
 // ИМПОРТ КОМПОНЕНТОВ БИЗНЕС-ЛОГИКИ С УКАЗАНИЕМ ИХ ТИПОВ
-import { ContactList,type ContactListProps } from '../../features/ContactList/ContactList';
-import { Requisites,type RequisitesProps } from '../../features/Requisites/Requisites';
+import { ContactList, type ContactListProps } from '../../features/ContactList/ContactList';
+import { Requisites, type RequisitesProps } from '../../features/Requisites/Requisites';
 import { WeatherWidget } from '@/components/WeatherWidget/WeatherWidget';
 import { Toast } from '@/components/Toast/Toast';
+
+// ИМПОРТ КАРТИНКИ АВТОПАРКА
+import trucksImg from '@/assets/trucks.png';
 
 interface NewsItem {
   id: number;
@@ -76,7 +79,7 @@ export const ImprintPage: React.FC = () => {
       {/* 2. Гибкий контейнер-обертка Flexbox для выравнивания */}
       <div style={{ display: 'flex', marginTop: '70px' }}>
         
-        {/* Боковая панель (ее ширина 240px заложена в css) */}
+        {/* Боковая панель */}
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* 3. Основной контент, автоматически занимающий все свободное место */}
@@ -110,6 +113,34 @@ export const ImprintPage: React.FC = () => {
             </Button>
           </header>
 
+          {/* СТИЛЬНЫЙ БАННЕР С ПРАВИЛЬНЫМ ИСПОЛЬЗОВАНИЕМ ПЕРЕМЕННОЙ trucksImg */}
+          <div style={{
+            width: '100%',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '16px',
+            padding: '20px 40px',
+            marginBottom: '40px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            boxShadow: 'var(--shadow)',
+            overflow: 'hidden',
+            boxSizing: 'border-box'
+          }}>
+            <img 
+              src={trucksImg} 
+              alt="Автопарк ГП Спецавтобаза г. Витебска" 
+              style={{
+                maxWidth: '100%',
+                height: 'auto',
+                maxHeight: '160px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.15))'
+              }}
+            />
+          </div>
+
           {/* Двухколоночная адаптивная сетка контента */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '32px', alignItems: 'start', position: 'relative', zIndex: 1 }}>
             
@@ -134,7 +165,7 @@ export const ImprintPage: React.FC = () => {
                     type="number" 
                     min={1} 
                     value={volume}
-                    onChange={(e) => setVolume(Math.max(1, Number(e.target.value)))} // Защита от ввода 0 и отрицательных чисел
+                    onChange={(e) => setVolume(Math.max(1, Number(e.target.value)))}
                   />
                 </div>
                 <div style={{ background: 'var(--accent-glow)', border: '1px solid var(--border-color)', padding: '16px', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -228,7 +259,7 @@ export const ImprintPage: React.FC = () => {
                 </div>
               </Card>
 
-              {/* Вызов списка контактов и реквизитов с жестким кастом типов для обхода кэша TS */}
+              {/* Вызов списка контактов и реквизитов */}
               <div id="contacts" style={{ scrollMarginTop: '100px' }}>
                 {React.createElement(ContactList as React.FC<ContactListProps>, { onCopySuccess: showNotification })}
               </div>
