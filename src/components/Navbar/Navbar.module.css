@@ -5,6 +5,8 @@
   right: 0;
   height: 70px;
   background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -12,48 +14,74 @@
   padding: 0 40px;
   z-index: 100;
   box-shadow: var(--shadow);
-  transition: background 0.3s, border 0.3s;
+  transition: all 0.3s ease;
+}
+
+/* Изменим цвет фона при светлой теме, сделав его слегка прозрачным */
+:not(:global(.dark)) .navbar {
+  background: rgba(255, 255, 255, 0.8);
+}
+:global(.dark) .navbar {
+  background: rgba(11, 15, 25, 0.8);
 }
 
 .logo {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: 0.5px;
 }
 
 .logoDot {
   color: var(--accent-primary);
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; text-shadow: 0 0 0px var(--accent-primary); }
+  50% { opacity: 1; text-shadow: 0 0 8px var(--accent-primary); }
 }
 
 .rightMenu {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
 }
 
 .menu {
   display: flex;
-  gap: 24px;
+  gap: 8px;
 }
 
 .link {
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
-  transition: color 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.link:hover, .activeLink {
-  color: var(--accent-primary);
+.link:hover {
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+:global(.dark) .link:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.activeLink {
+  color: var(--accent-primary) !important;
+  background: var(--accent-glow) !important;
 }
 
 .themeToggle {
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-main);
-  padding: 8px;
-  border-radius: 50%;
+  padding: 9px;
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -64,4 +92,5 @@
 .themeToggle:hover {
   border-color: var(--accent-primary);
   background: var(--accent-glow);
+  transform: scale(1.05);
 }

@@ -105,9 +105,23 @@ export const ImprintPage: React.FC = () => {
               <span style={{ color: 'var(--accent-primary)', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>
                 Информационно-сервисный портал
               </span>
-              <h1 style={{ fontSize: '32px', fontWeight: 800, margin: '8px 0 0 0', letterSpacing: '-0.5px' }}>
-                Государственное предприятие <span style={{ color: 'var(--accent-primary)' }}>"Спецавтобаза г. Витебска"</span>
-              </h1>
+              <h1 style={{ 
+  fontSize: '36px', 
+  fontWeight: 800, 
+  margin: '8px 0 0 0', 
+  letterSpacing: '-1px',
+  color: 'var(--text-main)'
+}}>
+  Государственное предприятие <br />
+  <span style={{ 
+    background: 'linear-gradient(135deg, var(--text-main) 30%, var(--accent-primary) 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    display: 'inline-block'
+  }}>
+    "Спецавтобаза г. Витебска"
+  </span>
+</h1>
             </div>
             <Button variant="primary" onClick={() => setIsModalOpen(true)}>
               🚨 Сообщить о проблеме
