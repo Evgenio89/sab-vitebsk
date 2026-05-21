@@ -1,0 +1,34 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.primary {
+  background: var(--accent-primary);
+  color: #000000; /* Темный текст на контрасте с неон-зеленым */
+  box-shadow: 0 4px 20px rgba(135, 249, 8, 0.2);
+}
+
+.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(135, 249, 8, 0.5);
+  filter: brightness(1.05);
+}
+
+.primary:active {
+  transform: translateY(-1px);
+}
+
+.fullWidth {
+  width: 100%;
+}

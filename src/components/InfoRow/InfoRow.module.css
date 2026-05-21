@@ -1,0 +1,42 @@
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 14px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: var(--text-muted);
+}
+
+.value {
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/* Копируемые реквизиты в виде футуристичных токенов */
+.copyable {
+  cursor: pointer;
+  color: var(--accent-primary);
+  background: rgba(135, 249, 8, 0.06);
+  border: 1px solid rgba(135, 249, 8, 0.15);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.copyable:hover {
+  background: var(--accent-primary);
+  color: #000000;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(135, 249, 8, 0.4);
+  font-weight: 600;
+}

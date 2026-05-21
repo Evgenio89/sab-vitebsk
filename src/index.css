@@ -1,0 +1,17 @@
+:root {
+  --bg-main: #06080c;           /* Еще более глубокий космический черный фон */
+  --bg-card: rgba(13, 17, 24, 0.75); /* Полупрозрачное темное стекло */
+  --border-color: rgba(135, 249, 8, 0.08); /* Границы с легким зеленым оттенком */
+  --accent-primary: #87f908;    /* Ваш кастомный неоновый зеленый */
+  --accent-glow: rgba(135, 249, 8, 0.12); /* Мягкое зеленое свечение */
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
