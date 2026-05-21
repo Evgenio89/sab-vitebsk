@@ -11,7 +11,7 @@ import { Modal } from '@/components/Modal/Modal';
 // ИМПОРТ КОМПОНЕНТОВ БИЗНЕС-ЛОГИКИ С УКАЗАНИЕМ ИХ ТИПОВ
 import { ContactList, type ContactListProps } from '../../features/ContactList/ContactList';
 import { Requisites, type RequisitesProps } from '../../features/Requisites/Requisites';
-import { WeatherWidget } from '@/components/WeatherWidget/WeatherWidget';
+import { WeatherWidget } from '../../components/WeatherWidget/WeatherWidget';
 import { Toast } from '@/components/Toast/Toast';
 
 // ИМПОРТ КАРТИНКИ АВТОПАРКА
