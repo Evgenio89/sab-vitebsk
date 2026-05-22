@@ -4,28 +4,27 @@ import { CloudSun, Snowflake, Sun, Thermometer } from 'lucide-react';
 import { Card } from '../Card/Card';
 
 export const WeatherWidget: React.FC = () => {
-  // По умолчанию сразу ставим базовую весеннюю температуру (+16°C), чтобы не было пустых точек
-  const [temp, setTemp] = useState<number>(16);
-  const [loading, setLoading] = useState(true);
+  // По умолчанию ставим весеннюю заглушку (+15), пока данные грузятся
+  const [temp, setTemp] = useState<number>(15);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Безопасный запрос по строгому HTTPS
+    // Координаты Витебска: latitude=55.19, longitude=30.20
     fetch('https://open-meteo.com')
       .then((res) => {
-        if (!res.ok) throw new Error('API Error');
+        if (!res.ok) throw new Error('Ошибка сети');
         return res.json();
       })
       .then((data) => {
+        // Проверяем структуру ответа от современного API Open-Meteo
         if (data && data.current && data.current.temperature_2m !== undefined) {
           setTemp(Math.round(data.current.temperature_2m));
-        } else if (data && data.current_weather) {
-          setTemp(Math.round(data.current_weather.temperature));
         }
         setLoading(false);
       })
       .catch((err) => {
-        console.warn('Используется резервный индикатор погоды:', err);
-        setLoading(false); // Мягко отключаем загрузку, оставляя дефолтную температуру
+        console.error('Не удалось загрузить погоду:', err);
+        setLoading(false);
       });
   }, []);
 
@@ -41,12 +40,12 @@ export const WeatherWidget: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {getWeatherIcon()}
           <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-            {temp <= 0 ? 'Спецтехника в режиме зимней уборки' : 'Уборка дорог по регламенту'}
+            {temp <= 0 ? 'Спецтехника в зимнем режиме' : 'Уборка улиц по регламенту'}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', fontSize: '24px', fontWeight: 800 }}>
+        <div style={{ display: 'flex', alignItems: 'center', fontSize: '24px', fontWeight: 800, color: 'var(--text-main)' }}>
           <Thermometer size={20} style={{ color: 'var(--text-muted)' }} />
-          {loading ? `${temp > 0 ? `+${temp}` : temp}°C` : `${temp > 0 ? `+${temp}` : temp}°C`}
+          {loading ? '...' : `${temp > 0 ? `+${temp}` : temp}°C`}
         </div>
       </div>
     </Card>

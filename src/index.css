@@ -1,23 +1,26 @@
 :root {
-  --bg-main: #f8fafc;           /* Более свежий, чистый цвет бумаги (Slate 50) */
-  --bg-card: #ffffff;
-  --border-color: #e2e8f0;
-  --accent-primary: #5ec200; 
-  --accent-glow: rgba(94, 194, 0, 0.06);
-  --text-main: #0f172a;         /* Глубокий графитовый */
-  --text-muted: #64748b;
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  --bg-main: #f8f9fa;           /* Официальный светло-серый фон */
+  --bg-card: #ffffff;           /* Чисто белые блоки и карточки */
+  --border-color: #e9ecef;      /* Тонкие, едва заметные границы */
+  --accent-primary: #28a745;    /* Тот самый благородный эко-зеленый */
+  --accent-hover: #218838;      /* Темно-зеленый для состояния наведения */
+  --accent-glow: rgba(40, 167, 69, 0.05); /* Мягкое эко-выделение */
+  --text-main: #212529;         /* Глубокий темно-серый графит для текста */
+  --text-muted: #6c757d;        /* Спокойный серый для подписей */
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.01), 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
+/* Автоматическая адаптация темной темы под эко-стиль */
 :root.dark {
-  --bg-main: #030712;           /* Глубокий монохромный ночной фон (Gray 950) */
-  --bg-card: #0b0f19;           /* Контрастные темные карточки */
-  --border-color: rgba(255, 255, 255, 0.05);
-  --accent-primary: #87f908; 
-  --accent-glow: rgba(135, 249, 8, 0.08);
-  --text-main: #f9fafb;
-  --text-muted: #9ca3af;
-  --shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  --bg-main: #121416;
+  --bg-card: #1a1d20;
+  --border-color: #2b3035;
+  --accent-primary: #2da94f;
+  --accent-hover: #34bd5a;
+  --accent-glow: rgba(45, 169, 79, 0.1);
+  --text-main: #f8f9fa;
+  --text-muted: #adb5bd;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -26,7 +29,5 @@ body {
   color: var(--text-main);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.3s ease;
 }

@@ -1,6 +1,7 @@
 // src/pages/ImprintPage/ImprintPage.tsx
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Navbar } from '@/components/Navbar/Navbar';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
 import { Card } from '@/components/Card/Card';
@@ -9,14 +10,24 @@ import { Button } from '@/components/Button/Button';
 import { Select } from '@/components/Select/Select';
 import { Modal } from '@/components/Modal/Modal';
 
-// ИМПОРТ КОМПОНЕНТОВ БИЗНЕС-ЛОГИКИ С СИСТЕМНЫМ УКАЗАНИЕМ ИХ ТИПОВ ДЛЯ VERBATIMMODULESYNTAX
 import { ContactList, type ContactListProps } from '../../features/ContactList/ContactList';
 import { Requisites, type RequisitesProps } from '../../features/Requisites/Requisites';
 import { WeatherWidget } from '../../components/WeatherWidget/WeatherWidget';
 import { Toast } from '@/components/Toast/Toast';
 
-// ИМПОРТ КАРТИНКИ АВТОПАРКА СЕЦТЕХНИКИ
 import trucksImg from '@/assets/trucks.png';
+
+interface RecenterMapProps {
+  coords: [number, number];
+}
+
+const RecenterMap: React.FC<RecenterMapProps> = ({ coords }) => {
+  const map = useMap();
+  React.useEffect(() => {
+    map.setView(coords, 15);
+  }, [coords, map]);
+  return null;
+};
 
 interface NewsItem {
   id: number;
@@ -25,7 +36,6 @@ interface NewsItem {
   date: string;
   category: 'graphics' | 'announcements' | 'tariffs';
 }
-
 export const ImprintPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('news');
   const [wasteType, setWasteType] = useState<string>('tko');
@@ -34,7 +44,6 @@ export const ImprintPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Статический массив ваших публикаций
   const staticNews: NewsItem[] = [
     {
       id: 3,
@@ -74,95 +83,46 @@ export const ImprintPage: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-main)', scrollBehavior: 'smooth' }}>
-      {/* 1. Верхняя фиксированная навигационная шапка */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* 2. Гибкий контейнер-обертка Flexbox для выравнивания */}
       <div style={{ display: 'flex', marginTop: '70px' }}>
-        
-        {/* Боковая липкая панель */}
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* 3. Основной контент, автоматически занимающий все свободное место */}
-        <div style={{
-          flex: 1,
-          padding: '40px',
-          maxWidth: '1300px',
-          position: 'relative',
-          boxSizing: 'border-box'
-        }}>
+        <div style={{ flex: 1, padding: '40px', maxWidth: '1300px', position: 'relative', boxSizing: 'border-box' }}>
           
-          {/* Мягкий градиентный фоновый эффект */}
           <div style={{
             position: 'absolute', top: '5%', right: '5%', width: '400px', height: '400px',
-            background: 'radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%)',
+            background: 'radial-gradient(circle, rgba(40, 167, 69, 0.04) 0%, rgba(0,0,0,0) 70%)',
             filter: 'blur(100px)', pointerEvents: 'none', zIndex: 0
           }} />
 
-          {/* Заголовок страницы */}
           <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 1 }}>
             <div>
               <span style={{ color: 'var(--accent-primary)', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>
                 Информационно-сервисный портал
               </span>
-              <h1 style={{ 
-  fontSize: '36px', 
-  fontWeight: 800, 
-  margin: '8px 0 0 0', 
-  letterSpacing: '-1px',
-  color: 'var(--text-main)'
-}}>
-  Государственное предприятие <br />
-  <span style={{ 
-    background: 'linear-gradient(135deg, var(--text-main) 30%, var(--accent-primary) 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    display: 'inline-block'
-  }}>
-    "Спецавтобаза г. Витебска"
-  </span>
-</h1>
+              <h1 style={{ fontSize: '32px', fontWeight: 800, margin: '8px 0 0 0', letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
+                Государственное предприятие <br />
+                <span style={{ color: 'var(--accent-primary)' }}>"Спецавтобаза г. Витебска"</span>
+              </h1>
             </div>
             <Button variant="primary" onClick={() => setIsModalOpen(true)}>
               🚨 Сообщить о проблеме
             </Button>
           </header>
 
-          {/* Широкоформатный баннер спецтехники автопарка */}
           <div style={{
-            width: '100%',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '16px',
-            padding: '20px 40px',
-            marginBottom: '40px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            boxShadow: 'var(--shadow)',
-            overflow: 'hidden',
-            boxSizing: 'border-box'
+            width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px',
+            padding: '20px 40px', marginBottom: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center',
+            boxShadow: 'var(--shadow)', overflow: 'hidden', boxSizing: 'border-box'
           }}>
-            <img 
-              src={trucksImg} 
-              alt="Автопарк ГП Спецавтобаза г. Витебска" 
-              style={{
-                maxWidth: '100%',
-                height: 'auto',
-                maxHeight: '160px',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.15))'
-              }}
-            />
+            <img src={trucksImg} alt="Автопарк" style={{ maxWidth: '100%', height: 'auto', maxHeight: '160px', objectFit: 'contain' }} />
           </div>
 
-          {/* Двухколоночная адаптивная сетка контента */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '32px', alignItems: 'start', position: 'relative', zIndex: 1 }}>
             
-            {/* ЛЕВАЯ КОЛОНКА (Интерактив, Лента с анимациями) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               
-              {/* Калькулятор */}
               <Card title="Калькулятор стоимости вывоза отходов (Ориентировочный)">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                   <Select 
@@ -183,40 +143,39 @@ export const ImprintPage: React.FC = () => {
                     onChange={(e) => setVolume(Math.max(1, Number(e.target.value)))}
                   />
                 </div>
-                <div style={{ background: 'var(--accent-glow)', border: '1px solid var(--border-color)', padding: '16px', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', padding: '16px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Предварительная стоимость по тарифу:</span>
                   <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--accent-primary)' }}>{calculatePrice()} BYN</span>
                 </div>
               </Card>
-
-              {/* Лента публикаций с Framer Motion анимацией */}
               <div id="news" style={{ display: 'flex', flexDirection: 'column', gap: '20px', scrollMarginTop: '100px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0 }}>Актуальные публикации</h2>
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
                     {[
-                      { id: 'all', name: 'Все' },
-                      { id: 'announcements', name: 'Объявления' },
-                      { id: 'graphics', name: 'Графики' },
-                      { id: 'tariffs', name: 'Тарифы' }
+                      { id: 'all', name: 'Все публикации', icon: '📋' },
+                      { id: 'announcements', name: 'Объявления', icon: '📢' },
+                      { id: 'graphics', name: 'Графики', icon: '📅' },
+                      { id: 'tariffs', name: 'Тарифы', icon: '💳' }
                     ].map(btn => (
                       <button
                         key={btn.id}
                         onClick={() => setSelectedCategory(btn.id)}
                         style={{
-                          background: selectedCategory === btn.id ? 'var(--accent-primary)' : 'transparent',
-                          color: selectedCategory === btn.id ? '#000000' : 'var(--text-main)',
+                          background: selectedCategory === btn.id ? 'var(--accent-primary)' : 'var(--bg-card)',
+                          color: selectedCategory === btn.id ? '#ffffff' : 'var(--text-main)',
                           border: '1px solid var(--border-color)',
-                          padding: '6px 14px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 600, transition: 'all 0.2s'
+                          padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+                          display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s ease'
                         }}
                       >
+                        <span>{btn.icon}</span>
                         {btn.name}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Контейнер плавного скрытия и перестроения карточек (layout) */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <AnimatePresence mode="popLayout">
                     {filteredNews.map((item) => (
@@ -243,29 +202,33 @@ export const ImprintPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Встроенная интерактивная карта */}
               <Card title="Карта спецавтобазы г. Витебска">
-                <div style={{ width: '100%', height: '350px', background: '#121620', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  <iframe 
-                    title="Map"
-                    src="https://google.com"
-                    width="100%" 
-                    height="100%" 
-                    style={{ border: 0 }}
-                    allowFullScreen
-                  />
+                <div style={{ width: '100%', height: '350px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative', zIndex: 10 }}>
+                  <MapContainer center={[55.15942303753537, 30.264455059175337]} zoom={15} style={{ width: '100%', height: '100%' }}>
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+                    />
+                    <RecenterMap coords={[55.15942303753537, 30.264455059175337]} />
+                    <Marker position={[55.15942303753537, 30.264455059175337]}>
+                      <Popup>
+                        <div style={{ color: '#212529', fontFamily: 'sans-serif', fontSize: '13px' }}>
+                          <strong>ГП "Спецавтобаза г. Витебска"</strong><br />📍 Старобабиновичский тракт, 12
+                        </div>
+                      </Popup>
+                    </Marker>
+                  </MapContainer>
+                </div>
+                <div style={{ marginTop: '12px', textAlign: 'right' }}>
+                  <a href="https://yandex.by" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 600, textDecoration: 'none', background: 'var(--accent-glow)', padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', display: 'inline-block' }}>🗺️ Открыть в приложении Яндекс.Навигатор</a>
                 </div>
               </Card>
 
             </div>
 
-            {/* ПРАВАЯ КОЛОНКА (Служебные виджеты) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              
-              {/* Виджет живой погоды Витебска */}
               <WeatherWidget />
               
-              {/* Бланки документов */}
               <Card title="Документы и бланки">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {[
@@ -273,22 +236,22 @@ export const ImprintPage: React.FC = () => {
                     { name: 'Типовой контракт для юр. лиц.docx', size: '1.2 МБ' },
                     { name: 'Заявление на аренду техники.pdf', size: '115 КБ' }
                   ].map((doc, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '13px', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }} title={doc.name}>
-                          📄 {doc.name}
-                        </span>
+                    <div 
+                      key={idx} 
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)', transition: 'all 0.2s ease' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.background = 'var(--bg-main)'; }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }} title={doc.name}>📄 {doc.name}</span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{doc.size}</span>
                       </div>
-                      <a href="#" onClick={(e) => { e.preventDefault(); showNotification('Скачивание файла началось...'); }} style={{ color: 'var(--accent-primary)', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}>
-                        Скачать
-                      </a>
+                      <a href="#" onClick={(e) => { e.preventDefault(); showNotification('Скачивание файла началось...'); }} style={{ color: 'var(--accent-primary)', fontSize: '12px', fontWeight: 700, textDecoration: 'none', background: 'var(--bg-card)', padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)' }}>🖨 Получить</a>
                     </div>
                   ))}
                 </div>
               </Card>
 
-              {/* Вызов списка контактов и реквизитов */}
               <div id="contacts" style={{ scrollMarginTop: '100px' }}>
                 {React.createElement(ContactList as React.FC<ContactListProps>, { onCopySuccess: showNotification })}
               </div>
@@ -296,14 +259,12 @@ export const ImprintPage: React.FC = () => {
               <div id="requisites" style={{ scrollMarginTop: '100px' }}>
                 {React.createElement(Requisites as React.FC<RequisitesProps>, { onCopySuccess: showNotification })}
               </div>
-
             </div>
 
           </div>
         </div>
       </div>
 
-      {/* Модальное окно обратной связи */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Сигнал: Проблема на контейнерной площадке">
         <form onSubmit={(e) => { e.preventDefault(); showNotification('Ваш сигнал зафиксирован и передан диспетчерской бригаде.'); setIsModalOpen(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <Input label="Адрес площадки в г. Витебске" placeholder="ул. Строителей, д. 4" required />
@@ -315,15 +276,11 @@ export const ImprintPage: React.FC = () => {
               { value: 'dirty', label: 'Не убрана площадка после вывоза' }
             ]}
           />
-          <Button type="submit" variant="primary" fullWidth>
-            Отправить срочную заявку
-          </Button>
+          <Button type="submit" variant="primary" fullWidth>Отправить срочную заявку</Button>
         </form>
       </Modal>
 
-      {/* Компонент всплывающих уведомлений (Toasts) */}
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
-
     </div>
   );
 };
