@@ -45,6 +45,16 @@ export const ImprintPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollBtn(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const staticNews: NewsItem[] = [
     {
@@ -85,7 +95,7 @@ export const ImprintPage: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-main)', scrollBehavior: 'smooth' }}>
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navbar />
 
       <div style={{ display: 'flex', marginTop: '70px' }}>
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -120,7 +130,6 @@ export const ImprintPage: React.FC = () => {
           }}>
             <img src={trucksImg} alt="Автопарк" style={{ maxWidth: '100%', height: 'auto', maxHeight: '160px', objectFit: 'contain' }} />
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '32px', alignItems: 'start', position: 'relative', zIndex: 1 }}>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -147,7 +156,23 @@ export const ImprintPage: React.FC = () => {
                 </div>
                 <div style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', padding: '16px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Предварительная стоимость по тарифу:</span>
-                  <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--accent-primary)' }}>{calculatePrice()} BYN</span>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--accent-primary)' }}>{calculatePrice()} BYN</span>
+                    
+                    <button 
+                      onClick={() => { setVolume(1); setWasteType('tko'); }}
+                      title="Сбросить калькулятор"
+                      type="button"
+                      style={{
+                        background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '4px', transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+                    >
+                      ✕ Очистить
+                    </button>
+                  </div>
                 </div>
               </Card>
 
@@ -209,15 +234,12 @@ export const ImprintPage: React.FC = () => {
                 <div style={{ width: '100%', height: '350px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative', zIndex: 10 }}>
                   
                   {(() => {
-                    // Твои кастомные точные координаты
                     const position: [number, number] = [55.15942303753537, 30.264455059175337];
                     
-                    // Создаем пуленепробиваемый маркер через чистый HTML-текст (Иконка-булавка)
+                    // Абсолютно надежный маркер, который не ломается при Production-сборке
                     const ecoSvgIcon = L.divIcon({
                       html: `<div style="font-size: 32px; transform: translate(-10px, -28px); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); cursor: pointer;">📍</div>`,
-                      className: 'custom-eco-pin',
-                      iconSize: [32, 32],
-                      iconAnchor: [16, 32]
+                      className: 'custom-eco-pin'
                     });
 
                     return (
@@ -248,9 +270,77 @@ export const ImprintPage: React.FC = () => {
                 </div>
               </Card>
 
-            </div>
+              {/* ========================================== */}
+              {/* КАРТОЧКА УСЛУГИ: ВЫВОЗ ТКО */}
+              {/* ========================================== */}
+              <div id="waste" style={{ scrollMarginTop: '100px', marginTop: '32px' }}>
+                <Card title="🚜 Вывоз твердых коммунальных отходов (ТКО)">
+                  <p style={{ margin: '0 0 12px 0', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                    Обеспечиваем регулярный и плановый вывоз бытового, крупногабаритного и строительного мусора для населения, жилищных кооперативов и коммерческих организаций города Витебска.
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '16px 0' }}>
+                    <div style={{ background: 'var(--bg-main)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                      <strong style={{ display: 'block', fontSize: '13px', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Для населения:</strong>
+                      <span style={{ fontSize: '15px', fontWeight: 700 }}>По графику дворовых территорий</span>
+                    </div>
+                    <div style={{ background: 'var(--bg-main)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                      <strong style={{ display: 'block', fontSize: '13px', color: 'var(--accent-primary)', textTransform: 'uppercase' }}>Для бизнеса:</strong>
+                      <span style={{ fontSize: '15px', fontWeight: 700 }}>Установка евроконтейнеров 1.1 м³</span>
+                    </div>
+                  </div>
+                  <Button variant="primary" onClick={() => setIsModalOpen(true)}>Оформить договор на вывоз</Button>
+                </Card>
+              </div>
+              {/* ========================================== */}
+              {/* КАРТОЧКА УСЛУГИ: УБОРКА ТЕРРИТОРИЙ */}
+              {/* ========================================== */}
+              <div id="cleaning" style={{ scrollMarginTop: '100px', marginTop: '32px' }}>
+                <Card title="🧹 Санитарная уборка и очистка территорий">
+                  <p style={{ margin: '0 0 12px 0', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                    Оказываем профессиональные услуги по механизированной и ручной уборке улиц, парковок, заводских и дворовых территорий от грязи, пыли, листьев, а также обработке противогололедными смесями.
+                  </p>
+                  <ul style={{ margin: '12px 0', paddingLeft: '20px', color: 'var(--text-main)', fontSize: '14px', lineHeight: '1.8' }}>
+                    <li>Подметание и мойка асфальтовых покрытий спецмашинами</li>
+                    <li>Покос сорной растительности и уборка газонов</li>
+                    <li>Санитарно-гигиеническая дезинфекция мусоропроводных камер</li>
+                  </ul>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--accent-primary)', background: 'var(--accent-glow)', padding: '10px 16px', borderRadius: '6px', display: 'inline-block' }}>
+                    ⏱ Работаем круглосуточно в экстренных погодных условиях
+                  </div>
+                </Card>
+              </div>
 
-            {/* ПРАВАЯ КОЛОНКА (Служебная панель) */}
+              {/* ========================================== */}
+              {/* КАРТОЧКА УСЛУГИ: АРЕНДА ТЕХНИКИ */}
+              {/* ========================================== */}
+              <div id="rent" style={{ scrollMarginTop: '100px', marginTop: '32px' }}>
+                <Card title="🚛 Аренда специализированной техники с экипажем">
+                  <p style={{ margin: '0 0 16px 0', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                    Предоставляем во временное пользование собственный автопарк надежной коммунальной и строительной техники ГП «Спецавтобаза» для выполнения разовых и долгосрочных задач в Витебской области.
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                    {[
+                      { machine: 'Мусоровоз задней загрузки (МАЗ/ГАЗ)', price: 'от 65.00 BYN / час' },
+                      { machine: 'Погрузчик фронтальный (Амкодор)', price: 'от 78.00 BYN / час' },
+                      { machine: 'Самосвал грузоподъемностью до 20 тонн', price: 'от 55.00 BYN / час' },
+                      { machine: 'Подметально-уборочная машина "Бродвей"', price: 'от 90.00 BYN / час' }
+                    ].map((item, idx) => (
+                      <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'var(--bg-card)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.background = 'var(--bg-main)'; }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>{item.machine}</span>
+                        </div>
+                        <span style={{ fontWeight: 700, color: 'var(--accent-primary)', fontSize: '14px' }}>{item.price}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
+                    * В стоимость аренды уже включены затраты на ГСМ и работа квалифицированного оператора. Шаблон заявления доступен в блоке документов справа.
+                  </p>
+                </Card>
+              </div>
+
+            </div>
+            {/* ПРАВАЯ КОЛОНКА */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               
               <WeatherWidget />
@@ -262,12 +352,7 @@ export const ImprintPage: React.FC = () => {
                     { name: 'Типовой контракт для юр. лиц.docx', size: '1.2 МБ' },
                     { name: 'Заявление на аренду техники.pdf', size: '115 КБ' }
                   ].map((doc, idx) => (
-                    <div 
-                      key={idx} 
-                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)', transition: 'all 0.2s ease' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.background = 'var(--bg-main)'; }}
-                    >
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'var(--bg-card)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.background = 'var(--bg-main)'; }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }} title={doc.name}>📄 {doc.name}</span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{doc.size}</span>
@@ -292,7 +377,6 @@ export const ImprintPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Всплывающее модальное окно обратной связи */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Сигнал: Проблема на контейнерной площадке">
         <form onSubmit={(e) => { e.preventDefault(); showNotification('Ваш сигнал зафиксирован и передан диспетчерской бригаде.'); setIsModalOpen(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <Input label="Адрес площадки в г. Витебске" placeholder="ул. Строителей, д. 4" required />
@@ -308,7 +392,24 @@ export const ImprintPage: React.FC = () => {
         </form>
       </Modal>
 
-      {/* Системные уведомления Toasts */}
+      {/* Фича 4: Плавающая кнопка "Наверх" */}
+      {showScrollBtn && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          style={{
+            position: 'fixed', bottom: '30px', left: '280px',
+            background: 'var(--accent-primary)', color: '#ffffff', border: 'none',
+            width: '45px', height: '45px', borderRadius: '50%', cursor: 'pointer',
+            fontSize: '18px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)', zIndex: 100, transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          ↑
+        </button>
+      )}
+
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
 
     </div>

@@ -14,6 +14,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'contacts', label: 'Телефоны служб' },
   ];
 
+  // НОВЫЙ МАССИВ ДЛЯ КАТЕГОРИЙ УСЛУГ
+  const servicesNav = [
+    { id: 'waste', label: 'Вывоз ТКО' },
+    { id: 'cleaning', label: 'Уборка территорий' },
+    { id: 'rent', label: 'Аренда техники' },
+  ];
+
   return (
     <aside className={styles.sidebar}>
       <div className={styles.section}>
@@ -32,9 +39,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
       
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Категории услуг</div>
-        <a href="#waste" className={styles.sideLink}>Вывоз ТКО</a>
-        <a href="#cleaning" className={styles.sideLink}>Уборка территорий</a>
-        <a href="#rent" className={styles.sideLink}>Аренда техники</a>
+        {servicesNav.map((item) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            onClick={() => setActiveTab(item.id)}
+            className={`${styles.sideLink} ${activeTab === item.id ? styles.sideLinkActive : ''}`}
+          >
+            {item.label}
+          </a>
+        ))}
       </div>
     </aside>
   );

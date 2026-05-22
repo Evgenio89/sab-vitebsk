@@ -2,15 +2,11 @@
 import React, { useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import styles from './Navbar.module.css';
-import logoImg from '@/assets/logo.png'; // Импортируем логотип
+import logoImg from '@/assets/logo.png';
 
-interface NavbarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
+export const Navbar: React.FC = () => {
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [activeGlobalTab, setActiveGlobalTab] = useState('contacts'); // По умолчанию мы в разделе контактов
 
   const toggleTheme = () => {
     const nextDark = !isDark;
@@ -22,21 +18,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
     }
   };
 
-  const menuItems = [
-    { id: 'news', label: 'Лента новостей' },
-    { id: 'requisites', label: 'Реквизиты ГП' },
-    { id: 'contacts', label: 'Телефоны служб' },
+  // Глобальные разделы всего сайта Спецавтобазы
+  const globalMenu = [
+    { id: 'main', label: 'Главная' },
+    { id: 'services', label: 'Услуги предприятия' },
+    { id: 'contacts', label: 'Контакты и реквизиты' },
   ];
 
   return (
     <nav className={styles.navbar}>
-      {/* ОБНОВЛЕННЫЙ БЛОК: Логотип + Название */}
       <div className={styles.logo} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <img 
-          src={logoImg} 
-          alt="Спецавтобаза Лого" 
-          style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
-        />
+        <img src={logoImg} alt="Лого" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
         <div style={{ lineHeight: '1.1' }}>
           <span style={{ fontWeight: 800, fontSize: '16px' }}>САБ ВИТЕБСК</span>
           <span style={{ color: 'var(--accent-primary)', fontWeight: '800' }}>.</span>
@@ -46,12 +38,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
       <div className={styles.rightMenu}>
         <div className={styles.menu}>
-          {menuItems.map((item) => (
+          {globalMenu.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              onClick={() => setActiveTab(item.id)}
-              className={`${styles.link} ${activeTab === item.id ? styles.activeLink : ''}`}
+              onClick={() => setActiveGlobalTab(item.id)}
+              className={`${styles.link} ${activeGlobalTab === item.id ? styles.activeLink : ''}`}
             >
               {item.label}
             </a>
