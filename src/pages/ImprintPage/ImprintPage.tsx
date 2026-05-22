@@ -1,7 +1,9 @@
 // src/pages/ImprintPage/ImprintPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+
 import { Navbar } from '@/components/Navbar/Navbar';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
 import { Card } from '@/components/Card/Card';
@@ -14,7 +16,6 @@ import { ContactList, type ContactListProps } from '../../features/ContactList/C
 import { Requisites, type RequisitesProps } from '../../features/Requisites/Requisites';
 import { WeatherWidget } from '../../components/WeatherWidget/WeatherWidget';
 import { Toast } from '@/components/Toast/Toast';
-import L from 'leaflet'; // <- ДОБАВЬТЕ ЭТУ СТРОКУ НИЖЕ
 
 import trucksImg from '@/assets/trucks.png';
 
@@ -24,21 +25,11 @@ interface RecenterMapProps {
 
 const RecenterMap: React.FC<RecenterMapProps> = ({ coords }) => {
   const map = useMap();
-  React.useEffect(() => {
+  useEffect(() => {
     map.setView(coords, 15);
   }, [coords, map]);
   return null;
 };
-
-const ecoMarkerIcon = new L.Icon({
-  // Используем надежную стандартную SVG-иконку маркера из CDN, которая никогда не потеряется при сборке Vite
-  iconUrl: 'https://githubusercontent.com',
-  shadowUrl: 'https://cloudflare.com',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
 
 interface NewsItem {
   id: number;
@@ -159,6 +150,7 @@ export const ImprintPage: React.FC = () => {
                   <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--accent-primary)' }}>{calculatePrice()} BYN</span>
                 </div>
               </Card>
+
               <div id="news" style={{ display: 'flex', flexDirection: 'column', gap: '20px', scrollMarginTop: '100px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0 }}>Актуальные публикации</h2>
@@ -212,32 +204,55 @@ export const ImprintPage: React.FC = () => {
                   </AnimatePresence>
                 </div>
               </div>
-
+              {/* ПОЛНОЦЕННЫЙ БЛОК НЕЗАВИСИМОЙ КАРТЫ С ТЕКСТОВЫМ СИГНАЛЬНЫМ МАРКЕРОМ */}
               <Card title="Карта спецавтобазы г. Витебска">
                 <div style={{ width: '100%', height: '350px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative', zIndex: 10 }}>
-                  <MapContainer center={[55.15942303753537, 30.264455059175337]} zoom={15} style={{ width: '100%', height: '100%' }}>
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-                    />
-                    <RecenterMap coords={[55.15942303753537, 30.264455059175337]} />
-                    <Marker position={[55.15942303753537, 30.264455059175337]} icon={ecoMarkerIcon}>
-                      <Popup>
-                        <div style={{ color: '#212529', fontFamily: 'sans-serif', fontSize: '13px' }}>
-                          <strong>ГП "Спецавтобаза г. Витебска"</strong><br />📍 Старобабиновичский тракт, 12
-                        </div>
-                      </Popup>
-                    </Marker>
-                  </MapContainer>
+                  
+                  {(() => {
+                    // Твои кастомные точные координаты
+                    const position: [number, number] = [55.15942303753537, 30.264455059175337];
+                    
+                    // Создаем пуленепробиваемый маркер через чистый HTML-текст (Иконка-булавка)
+                    const ecoSvgIcon = L.divIcon({
+                      html: `<div style="font-size: 32px; transform: translate(-10px, -28px); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); cursor: pointer;">📍</div>`,
+                      className: 'custom-eco-pin',
+                      iconSize: [32, 32],
+                      iconAnchor: [16, 32]
+                    });
+
+                    return (
+                      <MapContainer center={position} zoom={15} style={{ width: '100%', height: '100%' }}>
+                        <TileLayer
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+                        />
+                        <RecenterMap coords={position} />
+                        
+                        <Marker position={position} icon={ecoSvgIcon}>
+                          <Popup>
+                            <div style={{ color: '#212529', fontFamily: 'sans-serif', fontSize: '13px', lineHeight: '1.4' }}>
+                              <strong>ГП "Спецавтобаза г. Витебска"</strong><br />
+                              📍 Старобабиновичский тракт, 12
+                            </div>
+                          </Popup>
+                        </Marker>
+                      </MapContainer>
+                    );
+                  })()}
+
                 </div>
                 <div style={{ marginTop: '12px', textAlign: 'right' }}>
-                  <a href="https://yandex.by" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 600, textDecoration: 'none', background: 'var(--accent-glow)', padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', display: 'inline-block' }}>🗺️ Открыть в приложении Яндекс.Навигатор</a>
+                  <a href="https://yandex.by" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 600, textDecoration: 'none', background: 'var(--accent-glow)', padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', display: 'inline-block' }}>
+                    🗺️ Открыть в приложении Яндекс.Навигатор
+                  </a>
                 </div>
               </Card>
 
             </div>
 
+            {/* ПРАВАЯ КОЛОНКА (Служебная панель) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+              
               <WeatherWidget />
               
               <Card title="Документы и бланки">
@@ -270,12 +285,14 @@ export const ImprintPage: React.FC = () => {
               <div id="requisites" style={{ scrollMarginTop: '100px' }}>
                 {React.createElement(Requisites as React.FC<RequisitesProps>, { onCopySuccess: showNotification })}
               </div>
+
             </div>
 
           </div>
         </div>
       </div>
 
+      {/* Всплывающее модальное окно обратной связи */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Сигнал: Проблема на контейнерной площадке">
         <form onSubmit={(e) => { e.preventDefault(); showNotification('Ваш сигнал зафиксирован и передан диспетчерской бригаде.'); setIsModalOpen(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <Input label="Адрес площадки в г. Витебске" placeholder="ул. Строителей, д. 4" required />
@@ -291,7 +308,9 @@ export const ImprintPage: React.FC = () => {
         </form>
       </Modal>
 
+      {/* Системные уведомления Toasts */}
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+
     </div>
   );
 };
