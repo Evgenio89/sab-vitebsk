@@ -14,6 +14,7 @@ import { ContactList, type ContactListProps } from '../../features/ContactList/C
 import { Requisites, type RequisitesProps } from '../../features/Requisites/Requisites';
 import { WeatherWidget } from '../../components/WeatherWidget/WeatherWidget';
 import { Toast } from '@/components/Toast/Toast';
+import L from 'leaflet'; // <- ДОБАВЬТЕ ЭТУ СТРОКУ НИЖЕ
 
 import trucksImg from '@/assets/trucks.png';
 
@@ -28,6 +29,16 @@ const RecenterMap: React.FC<RecenterMapProps> = ({ coords }) => {
   }, [coords, map]);
   return null;
 };
+
+const ecoMarkerIcon = new L.Icon({
+  // Используем надежную стандартную SVG-иконку маркера из CDN, которая никогда не потеряется при сборке Vite
+  iconUrl: 'https://githubusercontent.com',
+  shadowUrl: 'https://cloudflare.com',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
 interface NewsItem {
   id: number;
@@ -210,7 +221,7 @@ export const ImprintPage: React.FC = () => {
                       attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
                     />
                     <RecenterMap coords={[55.15942303753537, 30.264455059175337]} />
-                    <Marker position={[55.15942303753537, 30.264455059175337]}>
+                    <Marker position={[55.15942303753537, 30.264455059175337]} icon={ecoMarkerIcon}>
                       <Popup>
                         <div style={{ color: '#212529', fontFamily: 'sans-serif', fontSize: '13px' }}>
                           <strong>ГП "Спецавтобаза г. Витебска"</strong><br />📍 Старобабиновичский тракт, 12
