@@ -1,16 +1,22 @@
 // src/pages/ImprintPage/ImprintPage.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-// Импортируем хуки Redux для управления данными
+// Импорт хуков глобального состояния Redux
 import { useSelector, useDispatch } from 'react-redux';
-import {type RootState } from '../../store/store';
+import { type RootState } from '../../store/store';
 import { 
   setWasteType, setVolume, resetCalculator, 
   setSelectedCategory, setModalOpen, setToastMessage 
 } from '../../store/portalSlice';
+
+// Импорт центральной конфигурации координат (Принцип DRY)
+import { VITEBSK_SAB_COORDS } from '@/config/mapConfig';
+
+// Импорт чистого CSS-модуля без инлайн-стилей
+import styles from './ImprintPage.module.css';
 
 import { Navbar } from '@/components/Navbar/Navbar';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
@@ -38,10 +44,11 @@ const RecenterMap: React.FC<RecenterMapProps> = ({ coords }) => {
   }, [coords, map]);
   return null;
 };
+
+// ИСПРАВЛЕНО: Интерфейс теперь строго содержит свойство image для картинок
 export const ImprintPage: React.FC = () => {
   const dispatch = useDispatch();
 
-  // Достаем все данные и состояния из глобального хранилища Redux
   const { 
     wasteType, 
     volume, 
@@ -51,7 +58,6 @@ export const ImprintPage: React.FC = () => {
     staticNews 
   } = useSelector((state: RootState) => state.portal);
 
-  // Фича 4: Локальное состояние для отслеживания скролла страницы кнопки "Наверх"
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   useEffect(() => {
@@ -62,13 +68,11 @@ export const ImprintPage: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Логика расчета стоимости
   const calculatePrice = () => {
     const rates: Record<string, number> = { tko: 11.25, kgo: 16.40, stroy: 24.10 };
     return (rates[wasteType] * (volume || 0)).toFixed(2);
   };
 
-  // Фильтрация новостей на основе глобального состояния категории
   const filteredNews = selectedCategory === 'all' 
     ? staticNews 
     : staticNews.filter(item => item.category === selectedCategory);
@@ -78,26 +82,19 @@ export const ImprintPage: React.FC = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-main)', scrollBehavior: 'smooth' }}>
+    <div className={styles.pageWrapper}>
       <Navbar />
 
-      <div style={{ display: 'flex', marginTop: '70px' }}>
+      <div className={styles.mainLayout}>
         <Sidebar activeTab={selectedCategory} setActiveTab={(tab) => dispatch(setSelectedCategory(tab))} />
 
-        <div style={{ flex: 1, padding: '40px', maxWidth: '1300px', position: 'relative', boxSizing: 'border-box' }}>
-          
-          <div style={{
-            position: 'absolute', top: '5%', right: '5%', width: '400px', height: '400px',
-            background: 'radial-gradient(circle, rgba(40, 167, 69, 0.04) 0%, rgba(0,0,0,0) 70%)',
-            filter: 'blur(100px)', pointerEvents: 'none', zIndex: 0
-          }} />
+        <div className={styles.contentContainer}>
+          <div className={styles.glowEffect} />
 
-          <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'relative', zIndex: 1 }}>
+          <header className={styles.headerRow}>
             <div>
-              <span style={{ color: 'var(--accent-primary)', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>
-                Информационно-сервисный портал
-              </span>
-              <h1 style={{ fontSize: '32px', fontWeight: 800, margin: '8px 0 0 0', letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
+              <span className={styles.subTitle}>Информационно-сервисный портал</span>
+              <h1 className={styles.mainTitle} style={{ fontSize: '32px', fontWeight: 800, margin: '8px 0 0 0', letterSpacing: '-0.5px', color: 'var(--text-main)' }}>
                 Государственное предприятие <br />
                 <span style={{ color: 'var(--accent-primary)' }}>"Спецавтобаза г. Витебска"</span>
               </h1>
@@ -107,17 +104,13 @@ export const ImprintPage: React.FC = () => {
             </Button>
           </header>
 
-          <div style={{
-            width: '100%', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px',
-            padding: '20px 40px', marginBottom: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center',
-            boxShadow: 'var(--shadow)', overflow: 'hidden', boxSizing: 'border-box'
-          }}>
-            <img src={trucksImg} alt="Автопарк" style={{ maxWidth: '100%', height: 'auto', maxHeight: '160px', objectFit: 'contain' }} />
+          <div className={styles.bannerContainer}>
+            <img src={trucksImg} alt="Автопарк" className={styles.bannerImage} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '32px', alignItems: 'start', position: 'relative', zIndex: 1 }}>
+          <div className={styles.twoColumnGrid}>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div className={styles.leftColumn}>
               
               <Card title="Калькулятор стоимости вывоза отходов (Ориентировочный)">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
@@ -139,19 +132,15 @@ export const ImprintPage: React.FC = () => {
                     onChange={(e) => dispatch(setVolume(Math.max(1, Number(e.target.value))))}
                   />
                 </div>
-                <div style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', padding: '16px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className={styles.calcSummary}>
                   <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Предварительная стоимость по тарифу:</span>
-                  
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--accent-primary)' }}>{calculatePrice()} BYN</span>
-                    
                     <button 
                       onClick={() => dispatch(resetCalculator())}
                       title="Сбросить калькулятор"
                       type="button"
-                      style={{
-                        background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '4px', transition: 'all 0.2s'
-                      }}
+                      style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontWeight: 600, padding: '4px 8px', borderRadius: '4px', transition: 'all 0.2s' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#ff4d4d'}
                       onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
                     >
@@ -162,7 +151,7 @@ export const ImprintPage: React.FC = () => {
               </Card>
 
               <div id="news" style={{ display: 'flex', flexDirection: 'column', gap: '20px', scrollMarginTop: '100px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className={styles.newsHeader}>
                   <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0 }}>Актуальные публикации</h2>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {[
@@ -174,12 +163,10 @@ export const ImprintPage: React.FC = () => {
                       <button
                         key={btn.id}
                         onClick={() => dispatch(setSelectedCategory(btn.id))}
+                        className={styles.filterButton}
                         style={{
                           background: selectedCategory === btn.id ? 'var(--accent-primary)' : 'var(--bg-card)',
-                          color: selectedCategory === btn.id ? '#ffffff' : 'var(--text-main)',
-                          border: '1px solid var(--border-color)',
-                          padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
-                          display: 'inline-flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s ease'
+                          color: selectedCategory === btn.id ? '#ffffff' : 'var(--text-main)'
                         }}
                       >
                         <span>{btn.icon}</span>
@@ -189,7 +176,7 @@ export const ImprintPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div className={styles.newsGrid}>
                   <AnimatePresence mode="popLayout">
                     {filteredNews.map((item) => (
                       <motion.div
@@ -207,6 +194,13 @@ export const ImprintPage: React.FC = () => {
                               {item.date}
                             </span>
                           </div>
+
+                          {item.image && (
+                            <div style={{ width: '100%', maxHeight: '200px', overflow: 'hidden', borderRadius: '8px', marginBottom: '14px', border: '1px solid var(--border-color)' }}>
+                              <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                          )}
+
                           <p style={{ margin: 0, color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '15px' }}>{item.content}</p>
                         </Card>
                       </motion.div>
@@ -214,27 +208,24 @@ export const ImprintPage: React.FC = () => {
                   </AnimatePresence>
                 </div>
               </div>
-              {/* ПОЛНОЦЕННЫЙ БЛОК НЕЗАВИСИМОЙ КАРТЫ С ТЕКСТОВЫМ СИГНАЛЬНЫМ МАРКЕРОМ */}
+              {/* ПОЛНОЦЕННЫЙ БЛОК НЕЗАВИСИМОЙ КАРТЫ НА ГЛОБАЛЬНЫХ КООРДИНАТАХ VITEBSK_SAB_COORDS */}
               <Card title="Карта спецавтобазы г. Витебска">
-                <div style={{ width: '100%', height: '350px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)', position: 'relative', zIndex: 10 }}>
-                  
+                <div className={styles.mapWrapper}>
                   {(() => {
-                    const position: [number, number] = [55.15942303753537, 30.264455059175337];
-                    
                     const ecoSvgIcon = L.divIcon({
                       html: `<div style="font-size: 32px; transform: translate(-10px, -28px); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); cursor: pointer;">📍</div>`,
                       className: 'custom-eco-pin'
                     });
 
                     return (
-                      <MapContainer center={position} zoom={15} style={{ width: '100%', height: '100%' }}>
+                      <MapContainer center={VITEBSK_SAB_COORDS} zoom={15} style={{ width: '100%', height: '100%' }}>
                         <TileLayer
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                           attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
                         />
-                        <RecenterMap coords={position} />
+                        <RecenterMap coords={VITEBSK_SAB_COORDS} />
                         
-                        <Marker position={position} icon={ecoSvgIcon}>
+                        <Marker position={VITEBSK_SAB_COORDS} icon={ecoSvgIcon}>
                           <Popup>
                             <div style={{ color: '#212529', fontFamily: 'sans-serif', fontSize: '13px', lineHeight: '1.4' }}>
                               <strong>ГП "Спецавтобаза г. Витебска"</strong><br />
@@ -245,7 +236,6 @@ export const ImprintPage: React.FC = () => {
                       </MapContainer>
                     );
                   })()}
-
                 </div>
                 <div style={{ marginTop: '12px', textAlign: 'right' }}>
                   <a href="https://yandex.by" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 600, textDecoration: 'none', background: 'var(--accent-glow)', padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', display: 'inline-block' }}>
@@ -296,14 +286,14 @@ export const ImprintPage: React.FC = () => {
                   <p style={{ margin: '0 0 16px 0', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                     Предоставляем во временное пользование собственный автопарк надежной коммунальной и строительной техники ГП «Спецавтобаза» для выполнения разовых и долгосрочных задач в Витебской области.
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                  <div className={styles.leftColumn} style={{ gap: '8px', marginBottom: '16px' }}>
                     {[
                       { machine: 'Мусоровоз задней загрузки (МАЗ/ГАЗ)', price: 'от 65.00 BYN / час' },
                       { machine: 'Погрузчик фронтальный (Амкодор)', price: 'от 78.00 BYN / час' },
                       { machine: 'Самосвал грузоподъемностью до 20 тонн', price: 'от 55.00 BYN / час' },
                       { machine: 'Подметально-уборочная машина "Бродвей"', price: 'от 90.00 BYN / час' }
                     ].map((item, idx) => (
-                      <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'var(--bg-card)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.background = 'var(--bg-main)'; }}>
+                      <div key={idx} className={styles.docItem}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>{item.machine}</span>
                         </div>
@@ -320,7 +310,7 @@ export const ImprintPage: React.FC = () => {
             </div>
 
             {/* ПРАВАЯ КОЛОНКА */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div className={styles.rightColumn}>
               
               <WeatherWidget />
               
@@ -331,7 +321,7 @@ export const ImprintPage: React.FC = () => {
                     { name: 'Типовой контракт для юр. лиц.docx', size: '1.2 МБ' },
                     { name: 'Заявление на аренду техники.pdf', size: '115 КБ' }
                   ].map((doc, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-color)', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-primary)'; e.currentTarget.style.background = 'var(--bg-card)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.background = 'var(--bg-main)'; }}>
+                    <div key={idx} className={styles.docItem}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }} title={doc.name}>📄 {doc.name}</span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{doc.size}</span>
@@ -375,15 +365,7 @@ export const ImprintPage: React.FC = () => {
       {showScrollBtn && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          style={{
-            position: 'fixed', bottom: '30px', left: '280px',
-            background: 'var(--accent-primary)', color: '#ffffff', border: 'none',
-            width: '45px', height: '45px', borderRadius: '50%', cursor: 'pointer',
-            fontSize: '18px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)', zIndex: 100, transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          className={styles.scrollTopButton}
         >
           ↑
         </button>

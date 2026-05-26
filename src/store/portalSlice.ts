@@ -8,6 +8,7 @@ interface NewsItem {
   content: string;
   date: string;
   category: 'graphics' | 'announcements' | 'tariffs';
+  image?: string; // <- ДОБАВЬТЕ ЭТУ СТРОКУ СЮДА
 }
 
 export interface PortalState {
