@@ -1,8 +1,16 @@
 // src/pages/ImprintPage/ImprintPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+
+// Импортируем хуки Redux для управления данными
+import { useSelector, useDispatch } from 'react-redux';
+import {type RootState } from '../../store/store';
+import { 
+  setWasteType, setVolume, resetCalculator, 
+  setSelectedCategory, setModalOpen, setToastMessage 
+} from '../../store/portalSlice';
 
 import { Navbar } from '@/components/Navbar/Navbar';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
@@ -30,22 +38,20 @@ const RecenterMap: React.FC<RecenterMapProps> = ({ coords }) => {
   }, [coords, map]);
   return null;
 };
-
-interface NewsItem {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-  category: 'graphics' | 'announcements' | 'tariffs';
-}
 export const ImprintPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('news');
-  const [wasteType, setWasteType] = useState<string>('tko');
-  const [volume, setVolume] = useState<number>(1);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  
+  const dispatch = useDispatch();
+
+  // Достаем все данные и состояния из глобального хранилища Redux
+  const { 
+    wasteType, 
+    volume, 
+    selectedCategory, 
+    isModalOpen, 
+    toastMessage, 
+    staticNews 
+  } = useSelector((state: RootState) => state.portal);
+
+  // Фича 4: Локальное состояние для отслеживания скролла страницы кнопки "Наверх"
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   useEffect(() => {
@@ -56,41 +62,19 @@ export const ImprintPage: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const staticNews: NewsItem[] = [
-    {
-      id: 3,
-      title: 'Утверждены новые тарифы на второе полугодие',
-      content: 'На основании решения Витебского облисполкома скорректированы тарифы на обращение с твердыми коммунальными отходами для населения и юридических лиц.',
-      date: '20.05.2026',
-      category: 'tariffs'
-    },
-    {
-      id: 2,
-      title: 'Изменение графика вывоза крупногабаритных отходов',
-      content: 'В связи с проведением плановых уборочных работ в Первомайском районе, график движения спецтехники смещается на 1 час вперед.',
-      date: '18.05.2026',
-      category: 'graphics'
-    },
-    {
-      id: 1,
-      title: 'Плановые работы по дезинфекции контейнерных площадок',
-      content: 'Спецавтобаза приступает к весеннему этапу санитарной обработки мусороприемных камер и дворовых площадок города.',
-      date: '10.05.2026',
-      category: 'announcements'
-    },
-  ];
-
+  // Логика расчета стоимости
   const calculatePrice = () => {
     const rates: Record<string, number> = { tko: 11.25, kgo: 16.40, stroy: 24.10 };
     return (rates[wasteType] * (volume || 0)).toFixed(2);
   };
 
+  // Фильтрация новостей на основе глобального состояния категории
   const filteredNews = selectedCategory === 'all' 
     ? staticNews 
     : staticNews.filter(item => item.category === selectedCategory);
 
   const showNotification = (message: string) => {
-    setToastMessage(message);
+    dispatch(setToastMessage(message));
   };
 
   return (
@@ -98,7 +82,7 @@ export const ImprintPage: React.FC = () => {
       <Navbar />
 
       <div style={{ display: 'flex', marginTop: '70px' }}>
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Sidebar activeTab={selectedCategory} setActiveTab={(tab) => dispatch(setSelectedCategory(tab))} />
 
         <div style={{ flex: 1, padding: '40px', maxWidth: '1300px', position: 'relative', boxSizing: 'border-box' }}>
           
@@ -118,7 +102,7 @@ export const ImprintPage: React.FC = () => {
                 <span style={{ color: 'var(--accent-primary)' }}>"Спецавтобаза г. Витебска"</span>
               </h1>
             </div>
-            <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+            <Button variant="primary" onClick={() => dispatch(setModalOpen(true))}>
               🚨 Сообщить о проблеме
             </Button>
           </header>
@@ -130,6 +114,7 @@ export const ImprintPage: React.FC = () => {
           }}>
             <img src={trucksImg} alt="Автопарк" style={{ maxWidth: '100%', height: 'auto', maxHeight: '160px', objectFit: 'contain' }} />
           </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '32px', alignItems: 'start', position: 'relative', zIndex: 1 }}>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -139,7 +124,7 @@ export const ImprintPage: React.FC = () => {
                   <Select 
                     label="Тип отходов / ТКО"
                     value={wasteType}
-                    onChange={(e) => setWasteType(e.target.value)}
+                    onChange={(e) => dispatch(setWasteType(e.target.value))}
                     options={[
                       { value: 'tko', label: 'Твердые коммунальные отходы' },
                       { value: 'kgo', label: 'Крупногабаритный мусор' },
@@ -151,7 +136,7 @@ export const ImprintPage: React.FC = () => {
                     type="number" 
                     min={1} 
                     value={volume}
-                    onChange={(e) => setVolume(Math.max(1, Number(e.target.value)))}
+                    onChange={(e) => dispatch(setVolume(Math.max(1, Number(e.target.value))))}
                   />
                 </div>
                 <div style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', padding: '16px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -161,7 +146,7 @@ export const ImprintPage: React.FC = () => {
                     <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--accent-primary)' }}>{calculatePrice()} BYN</span>
                     
                     <button 
-                      onClick={() => { setVolume(1); setWasteType('tko'); }}
+                      onClick={() => dispatch(resetCalculator())}
                       title="Сбросить калькулятор"
                       type="button"
                       style={{
@@ -188,7 +173,7 @@ export const ImprintPage: React.FC = () => {
                     ].map(btn => (
                       <button
                         key={btn.id}
-                        onClick={() => setSelectedCategory(btn.id)}
+                        onClick={() => dispatch(setSelectedCategory(btn.id))}
                         style={{
                           background: selectedCategory === btn.id ? 'var(--accent-primary)' : 'var(--bg-card)',
                           color: selectedCategory === btn.id ? '#ffffff' : 'var(--text-main)',
@@ -236,7 +221,6 @@ export const ImprintPage: React.FC = () => {
                   {(() => {
                     const position: [number, number] = [55.15942303753537, 30.264455059175337];
                     
-                    // Абсолютно надежный маркер, который не ломается при Production-сборке
                     const ecoSvgIcon = L.divIcon({
                       html: `<div style="font-size: 32px; transform: translate(-10px, -28px); filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); cursor: pointer;">📍</div>`,
                       className: 'custom-eco-pin'
@@ -270,9 +254,7 @@ export const ImprintPage: React.FC = () => {
                 </div>
               </Card>
 
-              {/* ========================================== */}
               {/* КАРТОЧКА УСЛУГИ: ВЫВОЗ ТКО */}
-              {/* ========================================== */}
               <div id="waste" style={{ scrollMarginTop: '100px', marginTop: '32px' }}>
                 <Card title="🚜 Вывоз твердых коммунальных отходов (ТКО)">
                   <p style={{ margin: '0 0 12px 0', color: 'var(--text-muted)', lineHeight: '1.6' }}>
@@ -288,12 +270,11 @@ export const ImprintPage: React.FC = () => {
                       <span style={{ fontSize: '15px', fontWeight: 700 }}>Установка евроконтейнеров 1.1 м³</span>
                     </div>
                   </div>
-                  <Button variant="primary" onClick={() => setIsModalOpen(true)}>Оформить договор на вывоз</Button>
+                  <Button variant="primary" onClick={() => dispatch(setModalOpen(true))}>Оформить договор на вывоз</Button>
                 </Card>
               </div>
-              {/* ========================================== */}
+
               {/* КАРТОЧКА УСЛУГИ: УБОРКА ТЕРРИТОРИЙ */}
-              {/* ========================================== */}
               <div id="cleaning" style={{ scrollMarginTop: '100px', marginTop: '32px' }}>
                 <Card title="🧹 Санитарная уборка и очистка территорий">
                   <p style={{ margin: '0 0 12px 0', color: 'var(--text-muted)', lineHeight: '1.6' }}>
@@ -309,10 +290,7 @@ export const ImprintPage: React.FC = () => {
                   </div>
                 </Card>
               </div>
-
-              {/* ========================================== */}
               {/* КАРТОЧКА УСЛУГИ: АРЕНДА ТЕХНИКИ */}
-              {/* ========================================== */}
               <div id="rent" style={{ scrollMarginTop: '100px', marginTop: '32px' }}>
                 <Card title="🚛 Аренда специализированной техники с экипажем">
                   <p style={{ margin: '0 0 16px 0', color: 'var(--text-muted)', lineHeight: '1.6' }}>
@@ -340,6 +318,7 @@ export const ImprintPage: React.FC = () => {
               </div>
 
             </div>
+
             {/* ПРАВАЯ КОЛОНКА */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               
@@ -377,8 +356,8 @@ export const ImprintPage: React.FC = () => {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Сигнал: Проблема на контейнерной площадке">
-        <form onSubmit={(e) => { e.preventDefault(); showNotification('Ваш сигнал зафиксирован и передан диспетчерской бригаде.'); setIsModalOpen(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <Modal isOpen={isModalOpen} onClose={() => dispatch(setModalOpen(false))} title="Сигнал: Проблема на контейнерной площадке">
+        <form onSubmit={(e) => { e.preventDefault(); showNotification('Ваш сигнал зафиксирован и передан диспетчерской бригаде.'); dispatch(setModalOpen(false)); }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <Input label="Адрес площадки в г. Витебске" placeholder="ул. Строителей, д. 4" required />
           <Select 
             label="Что именно произошло?"
@@ -410,7 +389,7 @@ export const ImprintPage: React.FC = () => {
         </button>
       )}
 
-      {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+      {toastMessage && <Toast message={toastMessage} onClose={() => dispatch(setToastMessage(null))} />}
 
     </div>
   );
